@@ -1,0 +1,196 @@
+/* ==========================================================================
+   ĐIỆN LẠNH 61 - RESPONSIVE DESIGN & MOBILE-FIRST OPTIMIZATIONS
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. LAPTOP & TABLET (max-width: 1024px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    text-align: center;
+  }
+
+  .hero-content {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .hero-cta-group {
+    justify-content: center;
+  }
+
+  .hero-highlights-list {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .services-grid,
+  .reviews-grid,
+  .gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  .founder-grid {
+    grid-template-columns: 1fr;
+    max-width: 700px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .founder-timeline {
+    text-align: left;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   2. TABLET & LARGE MOBILE (max-width: 768px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  /* Navigation & Header */
+  .main-nav, .btn-header-call {
+    display: none;
+  }
+
+  .mobile-menu-toggle {
+    display: block;
+  }
+
+  .site-header {
+    height: 64px;
+  }
+
+  /* Hero Section */
+  .hero-section {
+    padding: 40px 0 50px 0;
+  }
+
+  .hero-title {
+    font-size: 2.1rem;
+  }
+
+  .hero-desc {
+    font-size: 0.98rem;
+    margin-bottom: 24px;
+  }
+
+  .hero-highlights-list {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    text-align: left;
+  }
+
+  /* Floating Badges on Mobile */
+  .hero-badge-float {
+    position: static;
+    margin: 12px auto 0 auto;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .badge-top-right, .badge-bottom-left {
+    animation: none;
+  }
+
+  /* Tools & Estimator */
+  .tools-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tool-card {
+    padding: 22px;
+  }
+
+  /* Branch Network & Map */
+  .branch-grid-wrapper {
+    grid-template-columns: 1fr;
+  }
+
+  .branch-map-box {
+    min-height: 350px;
+  }
+
+  .branch-map-box iframe {
+    min-height: 350px;
+  }
+
+  /* Booking Form */
+  .booking-wrapper {
+    padding: 24px 18px;
+  }
+
+  .booking-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Stats Counter */
+  .stats-banner-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .stat-number {
+    font-size: 1.7rem;
+  }
+
+  /* Sections Padding */
+  .services-section,
+  .tools-section,
+  .pricing-section,
+  .gallery-section,
+  .branch-section,
+  .reviews-section,
+  .booking-section,
+  .faq-section,
+  .founder-section {
+    padding: 50px 0;
+  }
+
+  .section-title {
+    font-size: 1.85rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   3. SMALL MOBILE PHONES (max-width: 480px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 1.75rem;
+  }
+
+  .services-grid,
+  .reviews-grid,
+  .gallery-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .btn-primary-glow,
+  .btn-secondary-glass {
+    width: 100%;
+    padding: 12px 18px;
+    font-size: 0.92rem;
+  }
+
+  .pricing-tab-btn {
+    padding: 8px 14px;
+    font-size: 0.82rem;
+  }
+
+  .footer-bottom-bar {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+}

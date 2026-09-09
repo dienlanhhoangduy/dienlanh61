@@ -1,236 +1,222 @@
 /**
- * ĐIỆN LẠNH 61 - CLIENT INTERACTION LOGIC (2026 ENGINE)
- * Hotline & Zalo: 0896.988.045 | Facebook: https://www.facebook.com/bgd.gd.5
- * Công Ty TNHH TM DV Điện Lạnh 61 | MST: 3703434341 | TP. Hồ Chí Minh
+ * ĐIỆN LẠNH 61 - JAVASCRIPT APPLICATION CORE (MULTI-PAGE & MODULAR)
+ * Hotline & Zalo: 0896.988.045 | MST: 3703434341 | TP. Hồ Chí Minh
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  initHeaderScroll();
-  initMobileDrawer();
+  initNavigation();
   initCostEstimator();
   initDiagnosticHub();
-  initPricingFilter();
+  initPricingTabs();
   initBranchSwitcher();
   initGalleryLightbox();
   initFaqAccordion();
-  initBookingSystem();
-  initScrollAnimations();
-  initBackToTop();
+  initBookingForm();
+  initScrollTopAndFloating();
   initSocialProofToast();
 });
 
 /* --------------------------------------------------------------------------
-   1. HEADER SCROLL & MOBILE DRAWER
+   1. NAVIGATION & ACTIVE MENU HIGHLIGHT
    -------------------------------------------------------------------------- */
-function initHeaderScroll() {
-  const header = document.querySelector('.site-header');
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 40) {
-      header.classList.add('scrolled');
-    } else {
-      header.classList.remove('scrolled');
+function initNavigation() {
+  const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+  const navLinks = document.querySelectorAll('.nav-link, .drawer-link, .bottom-bar-item');
+
+  navLinks.forEach(link => {
+    const href = link.getAttribute('href');
+    if (!href) return;
+    const linkPath = href.split('#')[0];
+    
+    if (linkPath === currentPath || (currentPath === '' && (linkPath === 'index.html' || linkPath === './'))) {
+      link.classList.add('active');
+    } else if (linkPath && linkPath !== currentPath) {
+      link.classList.remove('active');
     }
   });
-}
 
-function initMobileDrawer() {
-  const toggleBtn = document.getElementById('mobileMenuBtn');
-  const closeBtn = document.getElementById('closeDrawerBtn');
-  const drawer = document.getElementById('mobileDrawer');
+  // Mobile Drawer Toggle
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  const closeDrawerBtn = document.getElementById('closeDrawerBtn');
+  const mobileDrawer = document.getElementById('mobileDrawer');
+
+  if (mobileMenuBtn && mobileDrawer) {
+    mobileMenuBtn.addEventListener('click', () => {
+      mobileDrawer.classList.add('open');
+    });
+  }
+
+  if (closeDrawerBtn && mobileDrawer) {
+    closeDrawerBtn.addEventListener('click', () => {
+      mobileDrawer.classList.remove('open');
+    });
+  }
+
+  // Close drawer when clicking outside or clicking any link
+  document.addEventListener('click', (e) => {
+    if (mobileDrawer && mobileDrawer.classList.contains('open')) {
+      if (!mobileDrawer.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+        mobileDrawer.classList.remove('open');
+      }
+    }
+  });
+
   const drawerLinks = document.querySelectorAll('.drawer-link');
-
-  if (toggleBtn && drawer) {
-    toggleBtn.addEventListener('click', () => {
-      drawer.classList.add('open');
-    });
-  }
-
-  if (closeBtn && drawer) {
-    closeBtn.addEventListener('click', () => {
-      drawer.classList.remove('open');
-    });
-  }
-
   drawerLinks.forEach(link => {
     link.addEventListener('click', () => {
-      drawer.classList.remove('open');
+      if (mobileDrawer) mobileDrawer.classList.remove('open');
     });
   });
 }
 
 /* --------------------------------------------------------------------------
-   2. INTERACTIVE COST ESTIMATOR
+   2. SMART COST ESTIMATOR
    -------------------------------------------------------------------------- */
-const ESTIMATOR_DATA = {
-  'ac_wall': {
-    'vesinh': { price: '150.000đ - 200.000đ', warranty: 'Bảo hành chảy nước 30 ngày' },
-    'napgas': { price: '250.000đ - 450.000đ', warranty: 'Bảo hành xì gas 6 tháng' },
-    'khonglanh': { price: '350.000đ - 650.000đ', warranty: 'Bảo hành linh kiện 6 - 12 tháng' },
-    'chaynuoc': { price: '150.000đ - 250.000đ', warranty: 'Bảo hành khắc phục 3 tháng' },
-    'thaolap': { price: '300.000đ - 500.000đ', warranty: 'Bảo hành thi công 6 tháng' }
+const PRICING_RULES = {
+  ac_wall: {
+    vesinh: { label: 'Vệ sinh máy lạnh treo tường (Khử khuẩn sinh học)', price: '150.000đ - 180.000đ' },
+    napgas: { label: 'Bơm bổ sung gas R32 / R410A máy lạnh treo tường', price: '200.000đ - 350.000đ' },
+    suachua: { label: 'Sửa lỗi máy lạnh không mát / chảy nước / chập bo', price: '250.000đ - 450.000đ' },
+    thaolap: { label: 'Tháo lắp & Di dời trọn gói máy lạnh treo tường', price: '300.000đ - 450.000đ' }
   },
-  'ac_cassette': {
-    'vesinh': { price: '350.000đ - 550.000đ', warranty: 'Bảo hành chảy nước 45 ngày' },
-    'napgas': { price: '500.000đ - 900.000đ', warranty: 'Bảo hành áp suất gas 6 tháng' },
-    'khonglanh': { price: '650.000đ - 1.500.000đ', warranty: 'Bảo hành mạch & block 6 - 12 tháng' },
-    'chaynuoc': { price: '250.000đ - 450.000đ', warranty: 'Bảo hành bơm thoát 3 tháng' },
-    'thaolap': { price: '600.000đ - 1.200.000đ', warranty: 'Bảo hành kỹ thuật 6 tháng' }
+  ac_cassette: {
+    vesinh: { label: 'Vệ sinh máy lạnh âm trần / tủ đứng áp lực cao', price: '350.000đ - 550.000đ' },
+    napgas: { label: 'Nạp gas chuẩn định lượng máy lạnh công nghiệp', price: '450.000đ - 850.000đ' },
+    suachua: { label: 'Sửa chữa máy lạnh âm trần lỗi bo mạch / bơm xả', price: '500.000đ - 950.000đ' },
+    thaolap: { label: 'Di dời lắp đặt máy lạnh âm trần kỹ thuật cao', price: '650.000đ - 1.200.000đ' }
   },
-  'fridge_standard': {
-    'vesinh': { price: '180.000đ - 250.000đ', warranty: 'Khử khuẩn sinh học an toàn' },
-    'napgas': { price: '450.000đ - 750.000đ', warranty: 'Bảo hành hàn kín 6 tháng' },
-    'khonglanh': { price: '350.000đ - 850.000đ', warranty: 'Bảo hành linh kiện 6 tháng' },
-    'chaynuoc': { price: '200.000đ - 350.000đ', warranty: 'Bảo hành nghẹt máng 3 tháng' },
-    'thaolap': { price: '200.000đ - 350.000đ', warranty: 'Di dời an toàn bảo vệ lốc' }
+  fridge_home: {
+    vesinh: { label: 'Bảo dưỡng, vệ sinh & khử mùi tủ lạnh gia đình', price: '200.000đ - 300.000đ' },
+    napgas: { label: 'Hàn xì & Nạp gas R600a / R134a tủ lạnh gia đình', price: '450.000đ - 750.000đ' },
+    suachua: { label: 'Sửa tủ không đông đá / hỏng quạt / lỗi cảm biến', price: '250.000đ - 550.000đ' },
+    thaolap: { label: 'Vận chuyển di dời cân chỉnh tủ lạnh tại nhà', price: '250.000đ - 400.000đ' }
   },
-  'fridge_sidebyside': {
-    'vesinh': { price: '350.000đ - 500.000đ', warranty: 'Bảo dưỡng dàn trao đổi nhiệt' },
-    'napgas': { price: '700.000đ - 1.200.000đ', warranty: 'Bảo hành nạp gas R600a 6 tháng' },
-    'khonglanh': { price: '650.000đ - 1.800.000đ', warranty: 'Bảo hành bo mạch/lốc 12 tháng' },
-    'chaynuoc': { price: '300.000đ - 500.000đ', warranty: 'Bảo hành đường làm đá 6 tháng' },
-    'thaolap': { price: '350.000đ - 600.000đ', warranty: 'Vận chuyển chuyên dụng đai bảo vệ' }
+  fridge_sidebyside: {
+    vesinh: { label: 'Vệ sinh chuyên sâu tủ lạnh Side-By-Side Inverter', price: '350.000đ - 500.000đ' },
+    napgas: { label: 'Xử lý xì giàn & Nạp gas tủ Side-By-Side', price: '650.000đ - 1.200.000đ' },
+    suachua: { label: 'Sửa tủ Side-By-Side lỗi bo mạch Inverter / Block', price: '600.000đ - 1.500.000đ' },
+    thaolap: { label: 'Di dời & Lắp đặt tủ Side-by-Side chống trầy xước', price: '400.000đ - 700.000đ' }
   },
-  'washer_top': {
-    'vesinh': { price: '250.000đ - 350.000đ', warranty: 'Rã lồng giặt tẩy cặn canxi' },
-    'napgas': { price: 'Khảo sát trực tiếp', warranty: 'Bảo hành linh kiện 6 tháng' },
-    'khonglanh': { price: '300.000đ - 650.000đ', warranty: 'Bảo hành sửa mạch/xả 6 tháng' },
-    'chaynuoc': { price: '200.000đ - 350.000đ', warranty: 'Bảo hành đường cấp xả 3 tháng' },
-    'thaolap': { price: '200.000đ - 300.000đ', warranty: 'Cân bằng chống rung lắc' }
+  wm_top: {
+    vesinh: { label: 'Vệ sinh rã lồng máy giặt cửa trên (Lồng đứng)', price: '250.000đ - 300.000đ' },
+    napgas: { label: 'Kiểm tra & Cân chỉnh hệ thống treo máy giặt', price: '200.000đ - 350.000đ' },
+    suachua: { label: 'Sửa máy giặt cửa trên không vắt / kêu to / lỗi xả', price: '250.000đ - 450.000đ' },
+    thaolap: { label: 'Di dời lắp đặt ống cấp thoát nước máy giặt', price: '200.000đ - 300.000đ' }
   },
-  'washer_front': {
-    'vesinh': { price: '350.000đ - 450.000đ', warranty: 'Vệ sinh tháo lồng & gioăng cao su' },
-    'napgas': { price: 'Khảo sát trực tiếp', warranty: 'Bảo hành chính hãng 6 tháng' },
-    'khonglanh': { price: '450.000đ - 1.200.000đ', warranty: 'Bảo hành thay chốt cửa/mạch 6-12 tháng' },
-    'chaynuoc': { price: '250.000đ - 450.000đ', warranty: 'Thay ron gioăng bảo hành 6 tháng' },
-    'thaolap': { price: '250.000đ - 400.000đ', warranty: 'Cố định lồng chuyên nghiệp' }
+  wm_front: {
+    vesinh: { label: 'Vệ sinh tháo lồng chuyên sâu máy giặt cửa ngang', price: '350.000đ - 500.000đ' },
+    napgas: { label: 'Bảo dưỡng thụt giảm xóc & Cân bằng động lồng ngang', price: '300.000đ - 550.000đ' },
+    suachua: { label: 'Sửa máy giặt cửa trước lỗi bo mạch / thay ron / kẹt cửa', price: '350.000đ - 750.000đ' },
+    thaolap: { label: 'Di dời lắp đặt cân thủy lực máy giặt cửa trước', price: '250.000đ - 400.000đ' }
   }
 };
 
 function initCostEstimator() {
   const deviceSelect = document.getElementById('estimateDevice');
   const serviceSelect = document.getElementById('estimateService');
+  const qtySelect = document.getElementById('estimateQty');
   const priceDisplay = document.getElementById('estimatePriceDisplay');
-  const warrantyDisplay = document.getElementById('estimateWarrantyDisplay');
-  const bookEstimateBtn = document.getElementById('bookEstimateBtn');
+  const serviceDetail = document.getElementById('estimateServiceDetail');
 
-  function updatePrice() {
+  if (!deviceSelect || !serviceSelect || !priceDisplay) return;
+
+  function updateEstimate() {
     const dev = deviceSelect.value;
     const srv = serviceSelect.value;
+    const qty = parseInt(qtySelect ? qtySelect.value : 1, 10) || 1;
 
-    if (ESTIMATOR_DATA[dev] && ESTIMATOR_DATA[dev][srv]) {
-      const data = ESTIMATOR_DATA[dev][srv];
-      priceDisplay.textContent = data.price;
-      warrantyDisplay.innerHTML = `<i class="fa-solid fa-shield-halved"></i> ${data.warranty}`;
-    } else {
-      priceDisplay.textContent = '150.000đ - 450.000đ';
-      warrantyDisplay.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Bảo hành chính hãng 6 - 12 tháng';
+    if (PRICING_RULES[dev] && PRICING_RULES[dev][srv]) {
+      const data = PRICING_RULES[dev][srv];
+      priceDisplay.textContent = data.price + (qty > 1 ? ` (x${qty})` : '');
+      if (serviceDetail) serviceDetail.textContent = data.label;
     }
   }
 
-  if (deviceSelect && serviceSelect) {
-    deviceSelect.addEventListener('change', updatePrice);
-    serviceSelect.addEventListener('change', updatePrice);
-    updatePrice();
-  }
-
-  if (bookEstimateBtn) {
-    bookEstimateBtn.addEventListener('click', () => {
-      const devText = deviceSelect.options[deviceSelect.selectedIndex].text;
-      const srvText = serviceSelect.options[serviceSelect.selectedIndex].text;
-      
-      const bookingDevice = document.getElementById('bookingDevice');
-      const bookingNote = document.getElementById('bookingNote');
-
-      if (bookingDevice) {
-        bookingDevice.value = devText;
-      }
-      if (bookingNote) {
-        bookingNote.value = `Yêu cầu dịch vụ: ${srvText} cho ${devText}. Dự toán: ${priceDisplay.textContent}`;
-      }
-
-      const bookingSec = document.getElementById('dat-lich');
-      if (bookingSec) {
-        bookingSec.scrollIntoView({ behavior: 'smooth' });
-      }
-    });
-  }
+  deviceSelect.addEventListener('change', updateEstimate);
+  serviceSelect.addEventListener('change', updateEstimate);
+  if (qtySelect) qtySelect.addEventListener('change', updateEstimate);
+  updateEstimate();
 }
 
 /* --------------------------------------------------------------------------
-   3. SMART DIAGNOSTIC HUB
+   3. DIAGNOSTIC HUB
    -------------------------------------------------------------------------- */
 const DIAGNOSTIC_DATA = {
-  'ac_leak': {
+  'ac-chay-nuoc': {
     title: 'Máy Lạnh Bị Chảy Nước Vào Phòng',
-    desc: 'Nguyên nhân thường do ống thoát nước bị nghẹt rêu mốc, máng hứng nước bẩn sau 4-6 tháng chưa vệ sinh, hoặc thiếu gas làm đóng tuyết dàn lạnh. Cần xịt thông tắc áp lực cao và vệ sinh máng.',
-    urgency: 'Nên xử lý ngay để tránh chập điện bo mạch và ẩm mốc tường nhà.'
+    desc: 'Nguyên nhân 90% do máng nước và ống thoát bị nghẹt cặn rêu sau 3-6 tháng sử dụng, hoặc máy bị bám tuyết do thiếu gas. Kỹ thuật viên sẽ thông ống và vệ sinh sạch sẽ chỉ trong 20 phút.',
+    urgency: '⚠️ Cần xử lý sớm để tránh chập điện bo mạch và ẩm mốc tường!'
   },
-  'ac_warm': {
-    title: 'Máy Lạnh Chỉ Phả Gió Không Mát',
-    desc: 'Nguyên nhân do dàn tản nhiệt bám bụi dày đặc cản lưu thông gió, rò rỉ gas môi chất lạnh, hỏng tụ khởi động (Kapa) hoặc hỏng quạt dàn nóng. Kỹ thuật viên sẽ kiểm tra áp suất gas và tụ điện.',
-    urgency: 'Máy nén có nguy cơ quá tải cháy block nếu cố tình chạy liên tục.'
+  'ac-khong-lanh': {
+    title: 'Máy Lạnh Chỉ Phả Gió Nóng, Không Lạnh',
+    desc: 'Nguyên nhân thường do tụ đề quạt/block bị yếu, hết gas do xì đầu tán hoặc bo mạch Inverter không đóng relay cho cục nóng chạy.',
+    urgency: '⚡ Kỹ thuật viên có mặt sau 15-30 phút kiểm tra bằng đồng hồ đo áp suất.'
   },
-  'washer_shake': {
-    title: 'Máy Giặt Rung Lắc Mạnh & Kêu To',
-    desc: 'Do ty treo lồng giặt bị gãy/nhão lò xo, vòng bi (bạc đạn) bị vỡ do nước rỉ vào, hoặc máy giặt bị lệch chân đế không thăng bằng. Cần cân chỉnh hoặc thay bộ thụt giảm chấn chính hãng.',
-    urgency: 'Nếu không sửa ngay có thể làm biến dạng lồng giặt và vỡ vỏ máy.'
+  'ac-keu-to': {
+    title: 'Cục Nóng / Cục Lạnh Kêu To, Rung Rè Rè',
+    desc: 'Nguyên nhân do quạt lồng sóc bị lệch tâm, cao su chân đế cục nóng bị chai vỡ hoặc ốc siết vỏ máy bị lỏng sau thời gian dài rung lắc.',
+    urgency: '🔧 Cần cân chỉnh lại quạt để tránh gây hỏng motor và ảnh hưởng giấc ngủ.'
   },
-  'fridge_warm': {
-    title: 'Tủ Lạnh Ngăn Mát Không Lạnh / Hư Thực Phẩm',
-    desc: 'Do hệ thống xả đá tự động (sò lạnh, cầu chì nhiệt, timer) bị hỏng khiến tuyết bít kín đường gió xuống ngăn mát, hoặc quạt tản nhiệt dàn lạnh không quay.',
-    urgency: 'Cần khắc phục trong ngày để bảo quản thực phẩm cho gia đình.'
+  'tu-khong-dong': {
+    title: 'Tủ Lạnh Không Đông Đá / Ngăn Mát Không Lạnh',
+    desc: 'Do hệ thống xả đá tự động (sò lạnh, cầu chì nhiệt, timer) bị hỏng làm đóng tuyết bít đường gió, hoặc máy nén (Block) bị mất áp, xì gas giàn lạnh.',
+    urgency: '🚨 Cứu hộ khẩn cấp để thực phẩm trong tủ không bị ôi thiu hỏng hóc!'
   },
-  'fridge_side': {
-    title: 'Tủ Lạnh Side-By-Side Không Đông Đá / Mất Nguồn',
-    desc: 'Nguyên nhân có thể do lỗi bo mạch điều khiển Inverter, cảm biến nhiệt độ báo sai, hoặc rò rỉ gas giàn nóng bên trong thân tủ.',
-    urgency: 'Yêu cầu kỹ sư chuyên trách dòng Side-by-side đo đạc bo mạch.'
+  'tu-chay-nuoc': {
+    title: 'Tủ Lạnh Bị Đọng Nước, Chảy Nước Ra Sàn',
+    desc: 'Thường do lỗ thoát nước xả đá phía sau ngăn đá bị nghẹt, gioăng cao su cửa tủ bị hở làm lọt khí ẩm bên ngoài vào ngưng tụ.',
+    urgency: '💡 Thay ron zin hoặc thông đường thoát nước sẽ khắc phục triệt để ngay.'
   },
-  'ac_blink': {
-    title: 'Máy Lạnh Báo Lỗi Nhấp Nháy Đèn Bo Mạch',
-    desc: 'Mỗi thương hiệu (Daikin, Panasonic, LG, Samsung...) có mã lỗi riêng (mã U, L, F...). Kỹ thuật viên sẽ dùng thiết bị đọc mã lỗi chuyên dụng kiểm tra motor quạt, cảm biến phòng hoặc board vi xử lý.',
-    urgency: 'Kỹ thuật viên Điện Lạnh 61 mang sẵn bo mạch test tận nơi.'
+  'mg-khong-vat': {
+    title: 'Máy Giặt Không Vắt / Rung Lắc Dữ Dội',
+    desc: 'Nguyên nhân do van xả nước không mở làm nước còn ứ trong thùng, quang treo thụt giảm xóc bị hỏng hoặc đồ giặt bị dồn về một góc.',
+    urgency: '⚡ Cần ngắt máy kiểm tra van xả và thụt nhún để bảo vệ cốt lồng giặt.'
   }
 };
 
 function initDiagnosticHub() {
   const chips = document.querySelectorAll('.symptom-chip');
-  const adviceBox = document.getElementById('diagnosticAdviceBox');
-  const adviceTitle = document.getElementById('adviceTitle');
-  const adviceDesc = document.getElementById('adviceDesc');
-  const adviceUrgency = document.getElementById('adviceUrgency');
+  const titleElem = document.getElementById('adviceTitle');
+  const descElem = document.getElementById('adviceDesc');
+  const urgencyElem = document.getElementById('adviceUrgency');
+
+  if (!chips.length || !titleElem || !descElem) return;
 
   chips.forEach(chip => {
     chip.addEventListener('click', () => {
       chips.forEach(c => c.classList.remove('active'));
       chip.classList.add('active');
 
-      const code = chip.getAttribute('data-code');
-      if (DIAGNOSTIC_DATA[code]) {
-        const data = DIAGNOSTIC_DATA[code];
-        adviceTitle.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${data.title}`;
-        adviceDesc.textContent = data.desc;
-        adviceUrgency.textContent = data.urgency;
-        adviceBox.classList.add('show');
+      const key = chip.getAttribute('data-symptom');
+      if (DIAGNOSTIC_DATA[key]) {
+        titleElem.textContent = DIAGNOSTIC_DATA[key].title;
+        descElem.textContent = DIAGNOSTIC_DATA[key].desc;
+        if (urgencyElem) urgencyElem.textContent = DIAGNOSTIC_DATA[key].urgency;
       }
     });
   });
+
+  // Activate first chip by default
+  if (chips[0]) chips[0].click();
 }
 
 /* --------------------------------------------------------------------------
-   4. PRICING TABLE FILTER
+   4. PRICING TABS FILTER
    -------------------------------------------------------------------------- */
-function initPricingFilter() {
-  const tabs = document.querySelectorAll('.pricing-filter-tabs .tab-btn');
-  const rows = document.querySelectorAll('.pricing-table tbody tr');
+function initPricingTabs() {
+  const tabBtns = document.querySelectorAll('.pricing-tab-btn');
+  const tableRows = document.querySelectorAll('.pricing-table tbody tr');
 
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
+  if (!tabBtns.length) return;
 
-      const category = tab.getAttribute('data-filter');
-      rows.forEach(row => {
-        if (category === 'all' || row.getAttribute('data-category') === category) {
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const cat = btn.getAttribute('data-category');
+      tableRows.forEach(row => {
+        if (cat === 'all' || row.getAttribute('data-category') === cat) {
           row.style.display = '';
         } else {
           row.style.display = 'none';
@@ -256,6 +242,8 @@ function initBranchSwitcher() {
   const branchCards = document.querySelectorAll('.branch-card');
   const mapIframe = document.getElementById('branchMapIframe');
 
+  if (!branchCards.length) return;
+
   branchCards.forEach(card => {
     card.addEventListener('click', () => {
       branchCards.forEach(c => c.classList.remove('active'));
@@ -279,7 +267,8 @@ function initGalleryLightbox() {
   const lightboxTitle = document.getElementById('lightboxTitle');
   const lightboxLocation = document.getElementById('lightboxLocation');
   const closeLightboxBtn = document.getElementById('closeLightboxBtn');
-  const lightboxBookBtn = document.getElementById('lightboxBookBtn');
+
+  if (!galleryItems.length || !lightboxModal) return;
 
   galleryItems.forEach(item => {
     item.addEventListener('click', () => {
@@ -291,162 +280,106 @@ function initGalleryLightbox() {
       if (title && lightboxTitle) lightboxTitle.textContent = title.textContent;
       if (loc && lightboxLocation) lightboxLocation.innerHTML = loc.innerHTML;
 
-      if (lightboxModal) lightboxModal.classList.add('active');
+      lightboxModal.classList.add('active');
     });
   });
 
-  if (closeLightboxBtn && lightboxModal) {
+  if (closeLightboxBtn) {
     closeLightboxBtn.addEventListener('click', () => {
       lightboxModal.classList.remove('active');
     });
   }
 
-  if (lightboxBookBtn && lightboxModal) {
-    lightboxBookBtn.addEventListener('click', () => {
+  lightboxModal.addEventListener('click', (e) => {
+    if (e.target === lightboxModal) {
       lightboxModal.classList.remove('active');
-      const bookingSec = document.getElementById('dat-lich');
-      if (bookingSec) bookingSec.scrollIntoView({ behavior: 'smooth' });
-    });
-  }
-
-  if (lightboxModal) {
-    lightboxModal.addEventListener('click', (e) => {
-      if (e.target === lightboxModal) {
-        lightboxModal.classList.remove('active');
-      }
-    });
-  }
+    }
+  });
 }
 
 /* --------------------------------------------------------------------------
    7. FAQ ACCORDION
    -------------------------------------------------------------------------- */
 function initFaqAccordion() {
-  const faqItems = document.querySelectorAll('.faq-item');
-  faqItems.forEach(item => {
-    const question = item.querySelector('.faq-question');
-    if (question) {
-      question.addEventListener('click', () => {
-        const isOpen = item.classList.contains('open');
-        faqItems.forEach(i => i.classList.remove('open'));
-        if (!isOpen) {
-          item.classList.add('open');
-        }
-      });
-    }
+  const faqQuestions = document.querySelectorAll('.faq-question');
+  if (!faqQuestions.length) return;
+
+  faqQuestions.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.parentElement;
+      const isActive = item.classList.contains('active');
+
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+
+      if (!isActive) {
+        item.classList.add('active');
+      }
+    });
   });
 }
 
 /* --------------------------------------------------------------------------
-   8. BOOKING SYSTEM & SUCCESS MODAL
+   8. BOOKING FORM HANDLER & ZALO DEEP LINK
    -------------------------------------------------------------------------- */
-function initBookingSystem() {
+function initBookingForm() {
   const form = document.getElementById('serviceBookingForm');
-  const modal = document.getElementById('bookingSuccessModal');
-  const closeModalBtn = document.getElementById('closeModalBtn');
-  const modalZaloBtn = document.getElementById('modalZaloBtn');
+  const successModal = document.getElementById('bookingSuccessModal');
   const bookingCodeDisplay = document.getElementById('bookingCodeDisplay');
+  const modalZaloBtn = document.getElementById('modalZaloBtn');
+  const closeModalBtn = document.getElementById('closeModalBtn');
 
-  if (form) {
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      
-      const name = document.getElementById('bookingName').value.trim();
-      const phone = document.getElementById('bookingPhone').value.trim();
-      const branch = document.getElementById('bookingBranch').value;
-      const device = document.getElementById('bookingDevice').value;
-      const timeSlot = document.getElementById('bookingTimeSlot') ? document.getElementById('bookingTimeSlot').value : 'Trong ngày';
-      const note = document.getElementById('bookingNote').value.trim();
+  if (!form) return;
 
-      if (!name || !phone) {
-        alert('Vui lòng nhập Họ tên và Số điện thoại để kỹ thuật viên liên hệ!');
-        return;
-      }
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
 
-      // Generate unique booking code
-      const bookingCode = 'DL61-' + Math.floor(100000 + Math.random() * 900000);
-      if (bookingCodeDisplay) {
-        bookingCodeDisplay.textContent = bookingCode;
-      }
+    const name = document.getElementById('bookingName')?.value || 'Khách Hàng';
+    const phone = document.getElementById('bookingPhone')?.value || '';
+    const branch = document.getElementById('bookingBranch')?.value || 'Trụ sở chính';
+    const device = document.getElementById('bookingDevice')?.value || 'Máy lạnh';
+    const timeSlot = document.getElementById('bookingTimeSlot')?.value || 'Càng sớm càng tốt';
+    const note = document.getElementById('bookingNote')?.value || 'Cần thợ kiểm tra';
 
-      // Prepare Zalo deep-link
-      const zaloMsg = encodeURIComponent(
-        `Chào Điện Lạnh 61, tôi vừa đặt lịch trực tuyến:\n- Mã Đơn: ${bookingCode}\n- Khách hàng: ${name}\n- SĐT: ${phone}\n- Cơ sở: ${branch}\n- Thiết bị: ${device}\n- Khung giờ: ${timeSlot}\n- Ghi chú: ${note}`
-      );
-      if (modalZaloBtn) {
-        modalZaloBtn.href = `https://zalo.me/0896988045?text=${zaloMsg}`;
-      }
+    // Generate Booking Code
+    const randomCode = 'DL61-' + Math.floor(100000 + Math.random() * 900000);
+    if (bookingCodeDisplay) bookingCodeDisplay.textContent = randomCode;
 
-      // Show modal
-      if (modal) {
-        modal.classList.add('active');
-      }
+    // Build Zalo Deep-Link
+    const zaloMsg = encodeURIComponent(
+      `Chào Điện Lạnh 61, tôi vừa đặt lịch [${randomCode}]:\n- Khách: ${name} (${phone})\n- Thiết bị: ${device}\n- Cơ sở gần: ${branch}\n- Thời gian: ${timeSlot}\n- Tình trạng: ${note}`
+    );
+    if (modalZaloBtn) {
+      modalZaloBtn.href = `https://zalo.me/0896988045?text=${zaloMsg}`;
+    }
 
-      form.reset();
-    });
-  }
+    if (successModal) {
+      successModal.classList.add('active');
+    }
 
-  if (closeModalBtn && modal) {
+    form.reset();
+  });
+
+  if (closeModalBtn && successModal) {
     closeModalBtn.addEventListener('click', () => {
-      modal.classList.remove('active');
+      successModal.classList.remove('active');
     });
   }
 
-  if (modal) {
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.classList.remove('active');
+  if (successModal) {
+    successModal.addEventListener('click', (e) => {
+      if (e.target === successModal) {
+        successModal.classList.remove('active');
       }
     });
   }
 }
 
 /* --------------------------------------------------------------------------
-   9. COUNTER SCROLL ANIMATIONS
+   9. SCROLL TO TOP & FLOATING PANEL
    -------------------------------------------------------------------------- */
-function initScrollAnimations() {
-  const statNumbers = document.querySelectorAll('.stat-number');
-  let animated = false;
+function initScrollTopAndFloating() {
+  const topBtn = document.getElementById('scrollToTopBtn');
 
-  function runCounters() {
-    statNumbers.forEach(stat => {
-      const target = parseInt(stat.getAttribute('data-target') || '0', 10);
-      const suffix = stat.getAttribute('data-suffix') || '';
-      let current = 0;
-      const increment = Math.ceil(target / 40);
-
-      const timer = setInterval(() => {
-        current += increment;
-        if (current >= target) {
-          stat.textContent = target.toLocaleString('vi-VN') + suffix;
-          clearInterval(timer);
-        } else {
-          stat.textContent = current.toLocaleString('vi-VN') + suffix;
-        }
-      }, 30);
-    });
-  }
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting && !animated) {
-        animated = true;
-        runCounters();
-      }
-    });
-  }, { threshold: 0.3 });
-
-  const statsSection = document.querySelector('.stats-banner-section');
-  if (statsSection) {
-    observer.observe(statsSection);
-  }
-}
-
-/* --------------------------------------------------------------------------
-   10. BACK TO TOP BUTTON
-   -------------------------------------------------------------------------- */
-function initBackToTop() {
-  const topBtn = document.getElementById('backToTopBtn');
   if (topBtn) {
     window.addEventListener('scroll', () => {
       if (window.scrollY > 400) {
@@ -463,7 +396,7 @@ function initBackToTop() {
 }
 
 /* --------------------------------------------------------------------------
-   11. LIVE SOCIAL PROOF TOAST NOTIFICATION (TP. HỒ CHÍ MINH)
+   10. LIVE SOCIAL PROOF TOAST NOTIFICATION (TP. HỒ CHÍ MINH)
    -------------------------------------------------------------------------- */
 const RECENT_ACTIVITIES = [
   { name: 'Anh Tuấn', loc: 'KDC Thống Nhất, Phường Dĩ An, TP.HCM', action: 'vừa đặt lịch Vệ sinh 2 máy lạnh Inverter', time: '2 phút trước' },
@@ -497,9 +430,9 @@ function initSocialProofToast() {
     index = (index + 1) % RECENT_ACTIVITIES.length;
   }
 
-  // Initial delay 4 seconds, then repeat every 14 seconds
+  // Initial delay 4s, repeat every 15s
   setTimeout(() => {
     showNextToast();
-    setInterval(showNextToast, 14000);
+    setInterval(showNextToast, 15000);
   }, 4000);
 }
