@@ -1,58 +1,138 @@
 /* ==========================================================================
-   ĐIỆN LẠNH 61 - CSS VARIABLES & DESIGN TOKENS
+   ĐIỆN LẠNH 24H - CSS VARIABLES & DESIGN TOKENS (2026 Premium Edition)
    ========================================================================== */
 
 :root {
-  /* Core Colors */
-  --bg-dark: #070d1e;
-  --bg-card: #0e172f;
-  --bg-card-hover: #152244;
-  --bg-card-glass: rgba(14, 23, 47, 0.85);
+  /* ── Core Background Palette ── */
+  --bg-dark: #060b18;
+  --bg-dark-alt: #0a1128;
+  --bg-card: #0d1530;
+  --bg-card-hover: #142040;
+  --bg-card-glass: rgba(13, 21, 48, 0.82);
   --bg-light: #f8fafc;
-  --bg-light-alt: #f1f5f9;
-  
-  /* Brand Accents */
+  --bg-light-alt: #f0f4f8;
+  --bg-light-card: #ffffff;
+  --bg-surface: #e8edf5;
+
+  /* ── Brand Accents ── */
   --primary: #0284c7;
+  --primary-dark: #0369a1;
   --primary-light: #38bdf8;
-  --primary-glow: rgba(2, 132, 199, 0.4);
+  --primary-lighter: #7dd3fc;
+  --primary-glow: rgba(2, 132, 199, 0.35);
+  --primary-glow-strong: rgba(56, 189, 248, 0.5);
+
   --cyan: #06b6d4;
-  --cyan-glow: rgba(6, 182, 212, 0.35);
+  --cyan-light: #22d3ee;
+  --cyan-glow: rgba(6, 182, 212, 0.3);
+
   --amber: #f59e0b;
   --amber-light: #fbbf24;
-  --amber-glow: rgba(245, 158, 11, 0.4);
+  --amber-dark: #d97706;
+  --amber-glow: rgba(245, 158, 11, 0.35);
+
   --emerald: #10b981;
-  --emerald-glow: rgba(16, 185, 129, 0.35);
+  --emerald-light: #34d399;
+  --emerald-glow: rgba(16, 185, 129, 0.3);
+
   --rose: #f43f5e;
+  --rose-light: #fb7185;
+  --rose-glow: rgba(244, 63, 94, 0.3);
+
+  --violet: #8b5cf6;
+  --violet-glow: rgba(139, 92, 246, 0.3);
+
   --facebook-blue: #1877f2;
   --zalo-blue: #0068ff;
-  
-  /* Text Colors */
+
+  /* ── Gradient Presets ── */
+  --gradient-primary: linear-gradient(135deg, #0284c7 0%, #06b6d4 100%);
+  --gradient-primary-dark: linear-gradient(135deg, #0369a1 0%, #0284c7 100%);
+  --gradient-amber: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  --gradient-hero: radial-gradient(ellipse at 60% 20%, #15224e 0%, #0a1128 50%, #060b18 100%);
+  --gradient-cta: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
+  --gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
+  --gradient-mesh: radial-gradient(at 40% 20%, rgba(6,182,212,0.15) 0%, transparent 50%),
+                   radial-gradient(at 80% 80%, rgba(139,92,246,0.1) 0%, transparent 50%),
+                   radial-gradient(at 10% 80%, rgba(245,158,11,0.08) 0%, transparent 50%);
+
+  /* ── Text Colors ── */
   --text-main: #0f172a;
+  --text-secondary: #1e293b;
   --text-muted: #64748b;
+  --text-light: #94a3b8;
   --text-dark-title: #0f172a;
   --text-dark-body: #334155;
   --text-white: #ffffff;
   --text-white-sub: #cbd5e1;
   --text-white-dim: #94a3b8;
 
-  /* Borders & Shadows */
-  --border-glass: rgba(255, 255, 255, 0.12);
+  /* ── Borders & Dividers ── */
+  --border-glass: rgba(255, 255, 255, 0.1);
+  --border-glass-hover: rgba(255, 255, 255, 0.2);
   --border-light: #e2e8f0;
-  --border-accent: rgba(56, 189, 248, 0.3);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 20px 35px -10px rgba(2, 132, 199, 0.15);
-  --shadow-glow: 0 0 25px rgba(56, 189, 248, 0.35);
+  --border-light-hover: #cbd5e1;
+  --border-accent: rgba(56, 189, 248, 0.25);
+  --border-accent-hover: rgba(56, 189, 248, 0.5);
 
-  /* Radius & Transitions */
-  --radius-sm: 8px;
+  /* ── Shadows (Layered for Depth) ── */
+  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 8px 24px -4px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 16px 40px -8px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 24px 50px -12px rgba(0, 0, 0, 0.18);
+  --shadow-glow-primary: 0 0 20px rgba(56, 189, 248, 0.3), 0 0 60px rgba(2, 132, 199, 0.15);
+  --shadow-glow-amber: 0 0 20px rgba(245, 158, 11, 0.3), 0 0 60px rgba(245, 158, 11, 0.1);
+  --shadow-glow-red: 0 0 20px rgba(239, 68, 68, 0.3), 0 0 60px rgba(239, 68, 68, 0.15);
+  --shadow-card-hover: 0 20px 40px -12px rgba(2, 132, 199, 0.2), 0 0 0 1px rgba(56, 189, 248, 0.1);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+  /* ── Glassmorphism Tokens ── */
+  --glass-bg: rgba(13, 21, 48, 0.75);
+  --glass-bg-light: rgba(255, 255, 255, 0.08);
+  --glass-blur: 16px;
+  --glass-blur-strong: 24px;
+  --glass-border: 1px solid rgba(255, 255, 255, 0.12);
+  --glass-border-hover: 1px solid rgba(255, 255, 255, 0.25);
+
+  /* ── Radius Scale ── */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
   --radius-md: 14px;
   --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-2xl: 36px;
   --radius-full: 9999px;
+
+  /* ── Spacing Scale ── */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+  --space-4xl: 80px;
+
+  /* ── Transition Presets ── */
   --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-smooth: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  
-  /* Typography */
-  --font-heading: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --transition-spring: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-slow: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ── Typography ── */
+  --font-heading: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* ── Z-Index Scale ── */
+  --z-base: 1;
+  --z-dropdown: 100;
+  --z-sticky: 500;
+  --z-header: 1000;
+  --z-drawer: 5000;
+  --z-modal: 10000;
+  --z-toast: 9000;
+  --z-floating: 999;
+  --z-bottom-bar: 9999;
 }

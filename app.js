@@ -1,10 +1,15 @@
 /**
- * ĐIỆN LẠNH 61 - JAVASCRIPT APPLICATION CORE (MULTI-PAGE & MODULAR)
+ * ĐIỆN LẠNH 24H - JAVASCRIPT APPLICATION CORE (2026 Premium Edition)
  * Hotline & Zalo: 0896.988.045 | MST: 3703434341 | TP. Hồ Chí Minh
+ * Features: Scroll-aware header, Intersection Observer animations, 
+ *           Counter animation, Enhanced interactions, Social proof
  */
 
 document.addEventListener('DOMContentLoaded', () => {
   initNavigation();
+  initScrollAwareHeader();
+  initScrollReveal();
+  initStatsCounter();
   initCostEstimator();
   initDiagnosticHub();
   initPricingTabs();
@@ -14,7 +19,21 @@ document.addEventListener('DOMContentLoaded', () => {
   initBookingForm();
   initScrollTopAndFloating();
   initSocialProofToast();
+  initSmoothPageLoad();
 });
+
+/* --------------------------------------------------------------------------
+   0. SMOOTH PAGE LOAD ANIMATION
+   -------------------------------------------------------------------------- */
+function initSmoothPageLoad() {
+  document.body.style.opacity = '0';
+  document.body.style.transition = 'opacity 0.4s ease';
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      document.body.style.opacity = '1';
+    });
+  });
+}
 
 /* --------------------------------------------------------------------------
    1. NAVIGATION & ACTIVE MENU HIGHLIGHT
@@ -39,38 +58,178 @@ function initNavigation() {
   const mobileMenuBtn = document.getElementById('mobileMenuBtn');
   const closeDrawerBtn = document.getElementById('closeDrawerBtn');
   const mobileDrawer = document.getElementById('mobileDrawer');
+  const mobileOverlay = document.getElementById('mobileOverlay');
 
-  if (mobileMenuBtn && mobileDrawer) {
-    mobileMenuBtn.addEventListener('click', () => {
-      mobileDrawer.classList.add('open');
-    });
+  function openDrawer() {
+    if (mobileDrawer) mobileDrawer.classList.add('open');
+    if (mobileOverlay) mobileOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
   }
 
-  if (closeDrawerBtn && mobileDrawer) {
-    closeDrawerBtn.addEventListener('click', () => {
-      mobileDrawer.classList.remove('open');
-    });
+  function closeDrawer() {
+    if (mobileDrawer) mobileDrawer.classList.remove('open');
+    if (mobileOverlay) mobileOverlay.classList.remove('open');
+    document.body.style.overflow = '';
   }
 
-  // Close drawer when clicking outside or clicking any link
+  if (mobileMenuBtn) {
+    mobileMenuBtn.addEventListener('click', openDrawer);
+  }
+
+  if (closeDrawerBtn) {
+    closeDrawerBtn.addEventListener('click', closeDrawer);
+  }
+
+  if (mobileOverlay) {
+    mobileOverlay.addEventListener('click', closeDrawer);
+  }
+
+  // Close drawer when clicking outside
   document.addEventListener('click', (e) => {
     if (mobileDrawer && mobileDrawer.classList.contains('open')) {
-      if (!mobileDrawer.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
-        mobileDrawer.classList.remove('open');
+      if (!mobileDrawer.contains(e.target) && mobileMenuBtn && !mobileMenuBtn.contains(e.target)) {
+        closeDrawer();
       }
     }
   });
 
+  // Close drawer on link click
   const drawerLinks = document.querySelectorAll('.drawer-link');
   drawerLinks.forEach(link => {
-    link.addEventListener('click', () => {
-      if (mobileDrawer) mobileDrawer.classList.remove('open');
-    });
+    link.addEventListener('click', closeDrawer);
+  });
+
+  // Close drawer on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeDrawer();
+      // Also close modals
+      document.querySelectorAll('.gallery-lightbox-modal.active, .booking-success-modal.active').forEach(modal => {
+        modal.classList.remove('active');
+      });
+    }
   });
 }
 
 /* --------------------------------------------------------------------------
-   2. SMART COST ESTIMATOR
+   1.5. SCROLL-AWARE HEADER (Shrink on scroll)
+   -------------------------------------------------------------------------- */
+function initScrollAwareHeader() {
+  const header = document.querySelector('.site-header');
+  if (!header) return;
+
+  let lastScroll = 0;
+  let ticking = false;
+
+  function updateHeader() {
+    const scrollY = window.scrollY || window.pageYOffset;
+    
+    if (scrollY > 50) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+
+    lastScroll = scrollY;
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(updateHeader);
+      ticking = true;
+    }
+  }, { passive: true });
+}
+
+/* --------------------------------------------------------------------------
+   2. SCROLL REVEAL ANIMATIONS (Intersection Observer)
+   -------------------------------------------------------------------------- */
+function initScrollReveal() {
+  const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
+  
+  if (!revealElements.length) return;
+
+  // Check for reduced motion preference
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    revealElements.forEach(el => el.classList.add('revealed'));
+    return;
+  }
+
+  const observerOptions = {
+    root: null,
+    rootMargin: '0px 0px -60px 0px',
+    threshold: 0.1
+  };
+
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('revealed');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+
+  revealElements.forEach(el => revealObserver.observe(el));
+}
+
+/* --------------------------------------------------------------------------
+   2.5. STATS COUNTER ANIMATION
+   -------------------------------------------------------------------------- */
+function initStatsCounter() {
+  const statNumbers = document.querySelectorAll('.stat-number[data-count]');
+  if (!statNumbers.length) return;
+
+  const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        animateCounter(entry.target);
+        counterObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  statNumbers.forEach(el => counterObserver.observe(el));
+}
+
+function animateCounter(element) {
+  const target = element.getAttribute('data-count');
+  const suffix = element.getAttribute('data-suffix') || '';
+  const prefix = element.getAttribute('data-prefix') || '';
+  const isDecimal = target.includes('.');
+  const targetNum = parseFloat(target.replace(/[^0-9.]/g, ''));
+  const duration = 2000;
+  const startTime = performance.now();
+
+  // Handle special formats like "15 - 30"
+  if (target.includes(' - ')) {
+    element.innerHTML = `${prefix}${target}<span>${suffix}</span>`;
+    return;
+  }
+
+  function updateCounter(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const easeOut = 1 - Math.pow(1 - progress, 3);
+    const current = isDecimal 
+      ? (targetNum * easeOut).toFixed(1)
+      : Math.floor(targetNum * easeOut).toLocaleString('vi-VN');
+    
+    element.innerHTML = `${prefix}${current}<span>${suffix}</span>`;
+
+    if (progress < 1) {
+      requestAnimationFrame(updateCounter);
+    } else {
+      element.innerHTML = `${prefix}${target}<span>${suffix}</span>`;
+    }
+  }
+
+  requestAnimationFrame(updateCounter);
+}
+
+/* --------------------------------------------------------------------------
+   3. SMART COST ESTIMATOR
    -------------------------------------------------------------------------- */
 const PRICING_RULES = {
   ac_wall: {
@@ -127,9 +286,23 @@ function initCostEstimator() {
 
     if (PRICING_RULES[dev] && PRICING_RULES[dev][srv]) {
       const data = PRICING_RULES[dev][srv];
-      priceDisplay.textContent = data.price + (qty > 1 ? ` (x${qty})` : '');
-      if (serviceDetail) serviceDetail.textContent = data.label;
+      
+      // Animate price change
+      priceDisplay.style.opacity = '0';
+      priceDisplay.style.transform = 'translateY(8px)';
+      
+      setTimeout(() => {
+        priceDisplay.textContent = data.price + (qty > 1 ? ` (x${qty})` : '');
+        if (serviceDetail) serviceDetail.textContent = data.label;
+        priceDisplay.style.opacity = '1';
+        priceDisplay.style.transform = 'translateY(0)';
+      }, 150);
     }
+  }
+
+  // Add transition styles
+  if (priceDisplay) {
+    priceDisplay.style.transition = 'opacity 0.15s ease, transform 0.15s ease';
   }
 
   deviceSelect.addEventListener('change', updateEstimate);
@@ -139,7 +312,7 @@ function initCostEstimator() {
 }
 
 /* --------------------------------------------------------------------------
-   3. DIAGNOSTIC HUB
+   4. DIAGNOSTIC HUB
    -------------------------------------------------------------------------- */
 const DIAGNOSTIC_DATA = {
   'ac-chay-nuoc': {
@@ -179,6 +352,7 @@ function initDiagnosticHub() {
   const titleElem = document.getElementById('adviceTitle');
   const descElem = document.getElementById('adviceDesc');
   const urgencyElem = document.getElementById('adviceUrgency');
+  const adviceBox = document.getElementById('diagnosticAdviceBox');
 
   if (!chips.length || !titleElem || !descElem) return;
 
@@ -189,19 +363,38 @@ function initDiagnosticHub() {
 
       const key = chip.getAttribute('data-symptom');
       if (DIAGNOSTIC_DATA[key]) {
-        titleElem.textContent = DIAGNOSTIC_DATA[key].title;
-        descElem.textContent = DIAGNOSTIC_DATA[key].desc;
-        if (urgencyElem) urgencyElem.textContent = DIAGNOSTIC_DATA[key].urgency;
+        // Animate content change
+        if (adviceBox) {
+          adviceBox.style.opacity = '0';
+          adviceBox.style.transform = 'translateY(6px)';
+          
+          setTimeout(() => {
+            titleElem.textContent = DIAGNOSTIC_DATA[key].title;
+            descElem.textContent = DIAGNOSTIC_DATA[key].desc;
+            if (urgencyElem) urgencyElem.textContent = DIAGNOSTIC_DATA[key].urgency;
+            adviceBox.style.opacity = '1';
+            adviceBox.style.transform = 'translateY(0)';
+          }, 180);
+        } else {
+          titleElem.textContent = DIAGNOSTIC_DATA[key].title;
+          descElem.textContent = DIAGNOSTIC_DATA[key].desc;
+          if (urgencyElem) urgencyElem.textContent = DIAGNOSTIC_DATA[key].urgency;
+        }
       }
     });
   });
+
+  // Add transition to advice box
+  if (adviceBox) {
+    adviceBox.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
+  }
 
   // Activate first chip by default
   if (chips[0]) chips[0].click();
 }
 
 /* --------------------------------------------------------------------------
-   4. PRICING TABS FILTER
+   5. PRICING TABS FILTER
    -------------------------------------------------------------------------- */
 function initPricingTabs() {
   const tabBtns = document.querySelectorAll('.pricing-tab-btn');
@@ -218,6 +411,7 @@ function initPricingTabs() {
       tableRows.forEach(row => {
         if (cat === 'all' || row.getAttribute('data-category') === cat) {
           row.style.display = '';
+          row.style.animation = 'fadeInUp 0.3s ease forwards';
         } else {
           row.style.display = 'none';
         }
@@ -227,7 +421,7 @@ function initPricingTabs() {
 }
 
 /* --------------------------------------------------------------------------
-   5. MULTI-BRANCH NETWORK SWITCHER (TP. HỒ CHÍ MINH)
+   6. MULTI-BRANCH NETWORK SWITCHER (TP. HỒ CHÍ MINH)
    -------------------------------------------------------------------------- */
 const BRANCH_MAPS = {
   'dian': 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3918.527376092109!2d106.77258447481928!3d10.847424689305457!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3174d96dad9ae675%3A0xd8a3f27858be8f33!2zxJBp4buHbiBM4bqhbmggNjE!5e0!3m2!1svi!2s!4v1742981064955!5m2!1svi!2s',
@@ -251,14 +445,24 @@ function initBranchSwitcher() {
 
       const branchKey = card.getAttribute('data-branch');
       if (BRANCH_MAPS[branchKey] && mapIframe) {
+        // Smooth map transition
+        mapIframe.style.opacity = '0.5';
         mapIframe.src = BRANCH_MAPS[branchKey];
+        mapIframe.onload = () => {
+          mapIframe.style.opacity = '1';
+        };
       }
     });
   });
+
+  // Add transition to iframe
+  if (mapIframe) {
+    mapIframe.style.transition = 'opacity 0.3s ease';
+  }
 }
 
 /* --------------------------------------------------------------------------
-   6. GALLERY LIGHTBOX MODAL
+   7. GALLERY LIGHTBOX MODAL (Enhanced with Keyboard Nav)
    -------------------------------------------------------------------------- */
 function initGalleryLightbox() {
   const galleryItems = document.querySelectorAll('.gallery-item');
@@ -270,35 +474,57 @@ function initGalleryLightbox() {
 
   if (!galleryItems.length || !lightboxModal) return;
 
-  galleryItems.forEach(item => {
-    item.addEventListener('click', () => {
-      const img = item.querySelector('img');
-      const title = item.querySelector('.gallery-overlay h4');
-      const loc = item.querySelector('.gallery-overlay p');
+  let currentIndex = 0;
+  const items = Array.from(galleryItems);
 
-      if (img && lightboxImg) lightboxImg.src = img.src;
-      if (title && lightboxTitle) lightboxTitle.textContent = title.textContent;
-      if (loc && lightboxLocation) lightboxLocation.innerHTML = loc.innerHTML;
+  function showLightbox(index) {
+    currentIndex = index;
+    const item = items[index];
+    const img = item.querySelector('img');
+    const title = item.querySelector('.gallery-overlay h4');
+    const loc = item.querySelector('.gallery-overlay p');
 
-      lightboxModal.classList.add('active');
-    });
+    if (img && lightboxImg) lightboxImg.src = img.src;
+    if (title && lightboxTitle) lightboxTitle.textContent = title.textContent;
+    if (loc && lightboxLocation) lightboxLocation.innerHTML = loc.innerHTML;
+
+    lightboxModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lightboxModal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  galleryItems.forEach((item, index) => {
+    item.addEventListener('click', () => showLightbox(index));
   });
 
   if (closeLightboxBtn) {
-    closeLightboxBtn.addEventListener('click', () => {
-      lightboxModal.classList.remove('active');
-    });
+    closeLightboxBtn.addEventListener('click', closeLightbox);
   }
 
   lightboxModal.addEventListener('click', (e) => {
-    if (e.target === lightboxModal) {
-      lightboxModal.classList.remove('active');
+    if (e.target === lightboxModal) closeLightbox();
+  });
+
+  // Keyboard navigation for lightbox
+  document.addEventListener('keydown', (e) => {
+    if (!lightboxModal.classList.contains('active')) return;
+    
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      showLightbox((currentIndex + 1) % items.length);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      showLightbox((currentIndex - 1 + items.length) % items.length);
     }
   });
 }
 
 /* --------------------------------------------------------------------------
-   7. FAQ ACCORDION
+   8. FAQ ACCORDION (Smooth Animation)
    -------------------------------------------------------------------------- */
 function initFaqAccordion() {
   const faqQuestions = document.querySelectorAll('.faq-question');
@@ -313,13 +539,19 @@ function initFaqAccordion() {
 
       if (!isActive) {
         item.classList.add('active');
+        // Scroll into view on mobile
+        if (window.innerWidth <= 768) {
+          setTimeout(() => {
+            item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }, 150);
+        }
       }
     });
   });
 }
 
 /* --------------------------------------------------------------------------
-   8. BOOKING FORM HANDLER & ZALO DEEP LINK
+   9. BOOKING FORM HANDLER & ZALO DEEP LINK
    -------------------------------------------------------------------------- */
 function initBookingForm() {
   const form = document.getElementById('serviceBookingForm');
@@ -340,13 +572,25 @@ function initBookingForm() {
     const timeSlot = document.getElementById('bookingTimeSlot')?.value || 'Càng sớm càng tốt';
     const note = document.getElementById('bookingNote')?.value || 'Cần thợ kiểm tra';
 
+    // Validate phone
+    const phoneRegex = /^(0[0-9]{9,10})$/;
+    if (!phoneRegex.test(phone.replace(/\s/g, ''))) {
+      const phoneInput = document.getElementById('bookingPhone');
+      if (phoneInput) {
+        phoneInput.style.borderColor = '#ef4444';
+        phoneInput.focus();
+        setTimeout(() => { phoneInput.style.borderColor = ''; }, 3000);
+      }
+      return;
+    }
+
     // Generate Booking Code
-    const randomCode = 'DL61-' + Math.floor(100000 + Math.random() * 900000);
+    const randomCode = 'DL24H-' + Math.floor(100000 + Math.random() * 900000);
     if (bookingCodeDisplay) bookingCodeDisplay.textContent = randomCode;
 
     // Build Zalo Deep-Link
     const zaloMsg = encodeURIComponent(
-      `Chào Điện Lạnh 61, tôi vừa đặt lịch [${randomCode}]:\n- Khách: ${name} (${phone})\n- Thiết bị: ${device}\n- Cơ sở gần: ${branch}\n- Thời gian: ${timeSlot}\n- Tình trạng: ${note}`
+      `Chào Điện Lạnh 24H, tôi vừa đặt lịch [${randomCode}]:\n- Khách: ${name} (${phone})\n- Thiết bị: ${device}\n- Cơ sở gần: ${branch}\n- Thời gian: ${timeSlot}\n- Tình trạng: ${note}`
     );
     if (modalZaloBtn) {
       modalZaloBtn.href = `https://zalo.me/0896988045?text=${zaloMsg}`;
@@ -354,40 +598,52 @@ function initBookingForm() {
 
     if (successModal) {
       successModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
     }
 
     form.reset();
   });
 
-  if (closeModalBtn && successModal) {
-    closeModalBtn.addEventListener('click', () => {
+  function closeSuccessModal() {
+    if (successModal) {
       successModal.classList.remove('active');
-    });
+      document.body.style.overflow = '';
+    }
+  }
+
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener('click', closeSuccessModal);
   }
 
   if (successModal) {
     successModal.addEventListener('click', (e) => {
-      if (e.target === successModal) {
-        successModal.classList.remove('active');
-      }
+      if (e.target === successModal) closeSuccessModal();
     });
   }
 }
 
 /* --------------------------------------------------------------------------
-   9. SCROLL TO TOP & FLOATING PANEL
+   10. SCROLL TO TOP & FLOATING PANEL
    -------------------------------------------------------------------------- */
 function initScrollTopAndFloating() {
   const topBtn = document.getElementById('scrollToTopBtn');
 
   if (topBtn) {
+    let ticking = false;
+
     window.addEventListener('scroll', () => {
-      if (window.scrollY > 400) {
-        topBtn.classList.add('show');
-      } else {
-        topBtn.classList.remove('show');
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          if (window.scrollY > 400) {
+            topBtn.classList.add('show');
+          } else {
+            topBtn.classList.remove('show');
+          }
+          ticking = false;
+        });
+        ticking = true;
       }
-    });
+    }, { passive: true });
 
     topBtn.addEventListener('click', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -396,14 +652,16 @@ function initScrollTopAndFloating() {
 }
 
 /* --------------------------------------------------------------------------
-   10. LIVE SOCIAL PROOF TOAST NOTIFICATION (TP. HỒ CHÍ MINH)
+   11. LIVE SOCIAL PROOF TOAST NOTIFICATION (TP. HỒ CHÍ MINH)
    -------------------------------------------------------------------------- */
 const RECENT_ACTIVITIES = [
   { name: 'Anh Tuấn', loc: 'KDC Thống Nhất, Phường Dĩ An, TP.HCM', action: 'vừa đặt lịch Vệ sinh 2 máy lạnh Inverter', time: '2 phút trước' },
   { name: 'Chị Mai', loc: 'Phường Thuận Giao, TP.HCM', action: 'vừa gọi cấp cứu Tủ lạnh không đông đá', time: '5 phút trước' },
   { name: 'Anh Hoàng Long', loc: 'Phường Hiệp Thành, TP.HCM', action: 'vừa đặt sửa Máy giặt lồng ngang rung lắc', time: '7 phút trước' },
   { name: 'Chị Ngọc Bích', loc: 'Phường Linh Tây, TP.HCM', action: 'vừa đặt Tháo lắp di dời máy lạnh', time: '11 phút trước' },
-  { name: 'Anh Minh', loc: 'Phường Khánh Bình, TP.HCM', action: 'vừa nạp gas R32 cho máy lạnh Daikin', time: '14 phút trước' }
+  { name: 'Anh Minh', loc: 'Phường Khánh Bình, TP.HCM', action: 'vừa nạp gas R32 cho máy lạnh Daikin', time: '14 phút trước' },
+  { name: 'Chị Hằng', loc: 'Phường Thạnh Lộc, TP.HCM', action: 'vừa đặt vệ sinh máy giặt rã lồng', time: '18 phút trước' },
+  { name: 'Anh Phúc', loc: 'Phường Thủ Đức, TP.HCM', action: 'vừa sửa xong máy lạnh chảy nước', time: '22 phút trước' }
 ];
 
 function initSocialProofToast() {
@@ -430,9 +688,9 @@ function initSocialProofToast() {
     index = (index + 1) % RECENT_ACTIVITIES.length;
   }
 
-  // Initial delay 4s, repeat every 15s
+  // Initial delay 5s, repeat every 18s
   setTimeout(() => {
     showNextToast();
-    setInterval(showNextToast, 15000);
-  }, 4000);
+    setInterval(showNextToast, 18000);
+  }, 5000);
 }

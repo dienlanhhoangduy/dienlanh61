@@ -1,21 +1,21 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- SEO Meta Tags -->
-  <title>Hệ Thống 6 Trạm Kỹ Thuật TP. Hồ Chí Minh - Điện Lạnh 61</title>
-  <meta name="description" content="Danh sách 6 trạm kỹ thuật Điện Lạnh 61 tại Phường Dĩ An, Thuận An, Thủ Dầu Một, Tân Uyên, Thủ Đức, Thạnh Lộc (TP.HCM). Có mặt sau 15-30 phút. Hotline: 0896.988.045">
+  <title>Hệ Thống 6 Trạm Kỹ Thuật TP. Hồ Chí Minh - Điện Lạnh 24H</title>
+  <meta name="description" content="Danh sách 6 trạm kỹ thuật Điện Lạnh 24H tại Phường Dĩ An, Thuận An, Thủ Dầu Một, Tân Uyên, Thủ Đức, Thạnh Lộc (TP.HCM). Có mặt sau 15-30 phút. Hotline: 0896.988.045">
   <meta name="keywords" content="điện lạnh dĩ an, điện lạnh thuận an, điện lạnh thủ dầu một, điện lạnh tân uyên, điện lạnh thủ đức, điện lạnh thạnh lộc">
-  <meta name="author" content="Điện Lạnh 61 - KS. Nguyễn Việt Hà">
-  <link rel="canonical" href="https://dienlanh61.com/chi-nhanh.html">
+  <meta name="author" content="Điện Lạnh 24H - KS. Nguyễn Việt Hà">
+  <link rel="canonical" href="https://dienlanh24h.vn/chi-nhanh.html">
 
   <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -45,9 +45,9 @@
   <header class="site-header">
     <div class="container header-inner">
       <a href="index.html" class="brand-logo">
-        <div class="brand-badge-icon">61</div>
+        <div class="brand-badge-icon">24H</div>
         <div class="brand-text">
-          <div class="logo-title">ĐIỆN LẠNH <span>61</span></div>
+          <div class="logo-title">ĐIỆN LẠNH <span>24H</span></div>
           <p>Kỹ Thuật Chuẩn Hãng 24/7</p>
         </div>
       </a>
@@ -63,7 +63,7 @@
       </nav>
 
       <div class="header-actions">
-        <a href="https://www.facebook.com/bgd.gd.5" target="_blank" rel="noopener" class="btn-header-social btn-social-fb" title="Facebook Điện Lạnh 61"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="https://www.facebook.com/bgd.gd.5" target="_blank" rel="noopener" class="btn-header-social btn-social-fb" title="Facebook Điện Lạnh 24H"><i class="fa-brands fa-facebook-f"></i></a>
         <a href="https://zalo.me/0896988045" target="_blank" rel="noopener" class="btn-header-social btn-social-zalo" title="Chat Zalo Tư Vấn"><i class="fa-solid fa-comment-dots"></i></a>
         <a href="tel:0896988045" class="btn-header-call"><i class="fa-solid fa-phone"></i><span>0896.988.045</span></a>
         <button class="mobile-menu-toggle" id="mobileMenuBtn" aria-label="Mở Menu"><i class="fa-solid fa-bars"></i></button>
@@ -71,14 +71,17 @@
     </div>
   </header>
 
+    <!-- Mobile Navigation Overlay -->
+  <div class="mobile-nav-overlay" id="mobileOverlay"></div>
+
   <!-- Mobile Drawer Menu -->
   <div class="mobile-nav-drawer" id="mobileDrawer">
     <div class="mobile-drawer-header">
       <div class="brand-logo">
-        <div class="brand-badge-icon">61</div>
-        <div class="brand-text"><div class="logo-title">ĐIỆN LẠNH <span>61</span></div></div>
+        <div class="brand-badge-icon">24H</div>
+        <div class="brand-text"><div class="logo-title">ĐIỆN LẠNH <span>24H</span></div></div>
       </div>
-      <button id="closeDrawerBtn" style="background:none; border:none; font-size:1.5rem; color:#64748b; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+      <button id="closeDrawerBtn" class="drawer-close-btn" aria-label="Dong Menu"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="drawer-links">
       <a href="index.html" class="drawer-link"><i class="fa-solid fa-house"></i> Trang Chủ</a>
@@ -218,22 +221,22 @@
       <div class="footer-grid">
         <div class="footer-col">
           <div class="brand-logo">
-            <div class="brand-badge-icon">61</div>
+            <div class="brand-badge-icon">24H</div>
             <div class="brand-text">
-              <div class="logo-title">ĐIỆN LẠNH <span>61</span></div>
+              <div class="logo-title">ĐIỆN LẠNH <span>24H</span></div>
               <p>Chất Lượng Tạo Nên Uy Tín</p>
             </div>
           </div>
           <p class="footer-company-desc">
-            CÔNG TY TNHH TM DV ĐIỆN LẠNH 61 là đơn vị tiên phong cung cấp giải pháp sửa chữa, bảo dưỡng và lắp đặt thiết bị cơ điện lạnh chất lượng cao tại TP. Hồ Chí Minh.
+            CÔNG TY TNHH TM DV ĐIỆN LẠNH 24H là đơn vị tiên phong cung cấp giải pháp sửa chữa, bảo dưỡng và lắp đặt thiết bị cơ điện lạnh chất lượng cao tại TP. Hồ Chí Minh.
           </p>
           <div class="footer-tax-info">
             <strong>Mã Số Thuế:</strong> 3703434341<br>
             <strong>Thời Gian:</strong> 7h00 - 21h00 (Trực 24/7)
           </div>
           <div class="footer-social-links">
-            <a href="https://www.facebook.com/bgd.gd.5" target="_blank" rel="noopener" class="footer-social-btn" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-            <a href="https://zalo.me/0896988045" target="_blank" rel="noopener" class="footer-social-btn" title="Zalo"><i class="fa-solid fa-comment-dots"></i></a>
+            <a href="https://www.facebook.com/bgd.gd.5" target="_blank" rel="noopener" class="footer-social-btn" title="Facebook Điện Lạnh 24H"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="https://zalo.me/0896988045" target="_blank" rel="noopener" class="footer-social-btn" title="Zalo Điện Lạnh 24H"><i class="fa-solid fa-comment-dots"></i></a>
             <a href="tel:0896988045" class="footer-social-btn" title="Gọi Điện Thoại"><i class="fa-solid fa-phone"></i></a>
           </div>
         </div>
@@ -287,7 +290,7 @@
       </div>
 
       <div class="footer-bottom-bar">
-        <div>Thiết kế và bản quyền thuộc về <strong>Mai Hoàng Duy</strong>.</div>
+        <div>Thiết kế và bản quyền © 2026 <strong>Điện Lạnh 24H</strong>.</div>
         <div style="display:flex; gap:16px; align-items:center;">
           <a href="https://www.facebook.com/bgd.gd.5" target="_blank" rel="noopener" style="color:#38bdf8;"><i class="fa-brands fa-facebook"></i> Facebook</a>
           <span>•</span>
@@ -299,9 +302,9 @@
 
   <!-- Floating Contact Panel -->
   <div class="floating-contact-panel">
-    <a href="https://www.facebook.com/bgd.gd.5" target="_blank" rel="noopener" class="float-btn float-fb" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-    <a href="https://zalo.me/0896988045" target="_blank" rel="noopener" class="float-btn float-zalo" title="Chat Zalo"><i class="fa-solid fa-comment-dots"></i></a>
-    <a href="tel:0896988045" class="float-btn float-phone" title="Gọi Ngay"><i class="fa-solid fa-phone-volume"></i></a>
+    <a href="https://www.facebook.com/bgd.gd.5" target="_blank" rel="noopener" class="float-btn float-fb" title="Facebook Điện Lạnh 24H"><i class="fa-brands fa-facebook-f"></i></a>
+    <a href="https://zalo.me/0896988045" target="_blank" rel="noopener" class="float-btn float-zalo" title="Chat Zalo 0896.988.045"><i class="fa-solid fa-comment-dots"></i></a>
+    <a href="tel:0896988045" class="float-btn float-phone" title="Gọi Cứu Hộ 0896.988.045"><i class="fa-solid fa-phone-volume"></i></a>
     <button class="float-btn float-top" id="scrollToTopBtn" aria-label="Lên đầu trang"><i class="fa-solid fa-chevron-up"></i></button>
   </div>
 
